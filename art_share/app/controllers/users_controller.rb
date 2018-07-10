@@ -27,22 +27,30 @@ class UsersController < ApplicationController
   
   def update
     user = User.find(params[:id])
-    user.update(user_params)
+    return render json: user.errors.full_messages, status: 404 unless user
     
-    render json: user
+    if user.update(user_params)
+      render json: user
+    else
+      render json: user.errors.full_messages, status: 422
+    end
   end
   
   def destroy
     user = User.find(params[:id])
-    user.delete
     
-    render json: user
+    if user
+      user.destroy(user_params)
+      render json: user
+    else
+      render json: user.errors.full_messages, status: 404
+    end
   end
   
   private
   
   def user_params
-    params.require(:user).permit(:name, :email)
+    params.require(:user).permit(:username)
   end
   
 end
